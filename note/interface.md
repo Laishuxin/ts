@@ -75,3 +75,58 @@ interface Animal {
 
 ## indexable types
 
+1. There are two types of supported index signatures: string and number. **The type returned from a numberic indexer must be a subtype of the type returned from the string index**.
+
+
+
+```ts
+interface Animal {
+  leg: number
+}
+
+interface Dog extends Animal {
+  eyes: number
+}
+
+interface NotOk { 
+  // error
+  [numberIndex: number]: Animal
+  [stringIndex: string]: Dog;
+  // correct
+  // [numberIndex: number]: Dog;
+  // [stringIndex: string]: Animal
+}
+
+// why? look at the following example: how the compiler decide to perform
+// that is puzzle for the compiler
+let notOk: NotOk = {}
+notOk[0]
+notOk["dog"]
+```
+
+
+
+2. **string index enforce that all properties match their return type**
+
+   ```ts
+   interface Animal {
+       [index: string]: number;
+       name: string; // <=== error
+   }
+   ```
+
+   That is because `obj["name"] != obj.name`
+
+3. readonly with indexable type
+
+   ```ts
+   console.log('--------------readonly----------------');
+   interface ReadOnlyAnimal {
+     readonly [index: number]: string;
+   }
+   
+   const animals: ReadOnlyAnimal = ['xiaohuang', 'xiaohei'];
+   animals[0] = 'xxx';   // error
+   ```
+
+   
